@@ -1,5 +1,7 @@
 import os
 import traceback
+import ntpath
+import posixpath
 from paraview.simple import *
 
 IMG_EXT = "png"
@@ -41,24 +43,49 @@ def get_loaded_foam_file():
     return None
 
 
+# def get_output_folder():
+#     """
+#     Create output folder based on loaded .foam file location.
+#     Example:
+#     R:\...\RUN14_xxx_1400W.foam
+#     -->
+#     R:\...\pp\_paraview_screenshots
+#     """
+#     foam_file = get_loaded_foam_file()
+
+#     if foam_file:
+#         case_dir = os.path.dirname(foam_file)
+#         out_dir = os.path.join(case_dir, "pp", "_paraview_screenshots")
+#         return out_dir, foam_file
+
+#     fallback_dir = os.path.join(os.getcwd(), "_paraview_screenshots")
+#     return fallback_dir, None
 def get_output_folder():
     """
     Create output folder based on loaded .foam file location.
-    Example:
+
+    Windows example:
     R:\...\RUN14_xxx_1400W.foam
-    -->
+    ->
     R:\...\pp\_paraview_screenshots
+
+    Linux example:
+    /home/shared/.../RUN14_xxx_1400W.foam
+    ->
+    /home/shared/.../pp/_paraview_screenshots
     """
     foam_file = get_loaded_foam_file()
 
     if foam_file:
-        case_dir = os.path.dirname(foam_file)
-        out_dir = os.path.join(case_dir, "pp", "_paraview_screenshots")
+        # Detect which path module matches the loaded file path
+        pathmod = posixpath if "/" in foam_file and "\\" not in foam_file else ntpath
+
+        case_dir = pathmod.dirname(foam_file)
+        out_dir = pathmod.join(case_dir, "pp", "_paraview_screenshots")
         return out_dir, foam_file
 
     fallback_dir = os.path.join(os.getcwd(), "_paraview_screenshots")
     return fallback_dir, None
-
 
 def get_layout_proxies():
     L = GetLayouts()
@@ -145,17 +172,9 @@ if foam_file:
 for i, lproxy in enumerate(layout_proxies, start=1):
     layout_name = get_layout_name_safe(lproxy, i)
 
-    # avoid duplicate layout names
-    base_name = layout_name
-    n = 2
-    while layout_name in used_names:
-        layout_name = "{}_{}".format(base_name, n)
-        n += 1
-    used_names.add(layout_name)
-
     out_png = os.path.join(
         OUT_DIR,
-        "{}_{}.{}".format(case_name, layout_name, IMG_EXT)
+        "{}_{}_{:02d}.{}".format(case_name, layout_name, i, IMG_EXT)
     )
 
     print("Saving ->", out_png)

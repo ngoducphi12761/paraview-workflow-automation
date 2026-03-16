@@ -1,0 +1,18 @@
+Place these 3 files
+
+	1. auto_take_screenshots.py
+
+	2. auto_take_screenshots_pv562.py
+
+	3. auto_take_screenshots_pv5101.py
+
+into this path:
+C:\Users\phiducngo\AppData\Roaming\ParaView\Macros\
+
+Then load auto_take_screenshots.py into Macros → Import New Macro... in ParaView 5.10.1 or 5.6.2.
+
+This automation only works on:
+
+	a) PV 5.10.1 – works on both a remote Linux server and a client Windows 11 machine.
+
+	b) PV 5.6.2 – works only on a client Windows 11 machine.
