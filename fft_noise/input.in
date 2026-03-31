@@ -1,0 +1,16 @@
+file_path = RUN03_CylinderAcousticValidation_yplus30_kEpsilon_v4/postProcessing/NP/0/FfowcsWilliamsHawkings.dat
+t_min = 6.0 # start time
+t_max = 9.899950000 # end time
+st_min = 0.0 # strouhal number minimum
+st_max = 1.0 # strouhal number maximum
+sample_step = 2 # use every 1th sample
+
+D = 0.019 # cylinder diameter [m]
+U_inf = 68.6 // freestream velocity [m/s]
+p_ref = 20e-6 # reference pressure [Pa]
+base_dt = 0.00005 # original time step [s]
+
+output_png = spl_vs_strouhal.png # output figure
+output_dat = SPLversusStrouhalnumber.dat # output data file
+smooth_window = 20
+window_type = none # should be "none" or "hann", "hann" to use hann windows
