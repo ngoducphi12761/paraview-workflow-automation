@@ -9,7 +9,7 @@ Place these 3 files
 into this path:
 C:\Users\phiducngo\AppData\Roaming\ParaView\Macros\
 
-Then load auto_take_screenshots.py into Macros → Import New Macro... in ParaView 5.10.1 or 5.6.2.
+Then open paraview 5.6.2 or 5.10.1 then choose auto_take_screenshots to export screenshots (auto_take_screenshots script will automatically detect which paraview version has been currently using)
 
 This automation only works on:
 

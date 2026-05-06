@@ -1,4 +1,4 @@
-file_path = RUN03_CylinderAcousticValidation_yplus30_kEpsilon_v4/postProcessing/NP/0/FfowcsWilliamsHawkings.dat
+file_path = RUN05_CylinderAcousticValidation_yplus200_v1/postProcessing/NP/0/FfowcsWilliamsHawkings.dat
 t_min = 6.0 # start time
 t_max = 9.899950000 # end time
 st_min = 0.0 # strouhal number minimum

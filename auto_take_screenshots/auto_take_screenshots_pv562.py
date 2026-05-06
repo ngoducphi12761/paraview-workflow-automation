@@ -42,24 +42,6 @@ def get_loaded_foam_file():
 
     return None
 
-
-# def get_output_folder():
-#     """
-#     Create output folder based on loaded .foam file location.
-#     Example:
-#     R:\...\RUN14_xxx_1400W.foam
-#     -->
-#     R:\...\pp\_paraview_screenshots
-#     """
-#     foam_file = get_loaded_foam_file()
-
-#     if foam_file:
-#         case_dir = os.path.dirname(foam_file)
-#         out_dir = os.path.join(case_dir, "pp", "_paraview_screenshots")
-#         return out_dir, foam_file
-
-#     fallback_dir = os.path.join(os.getcwd(), "_paraview_screenshots")
-#     return fallback_dir, None
 def get_output_folder():
     """
     Create output folder based on loaded .foam file location.
@@ -132,6 +114,51 @@ def get_layout_name_safe(lproxy, idx):
     return "Layout{0:02d}".format(idx)
 
 
+def get_layout_size(lproxy):
+    try:
+        size = lproxy.GetSize()
+        return [int(size[0]), int(size[1])]
+    except:
+        pass
+
+    try:
+        extents = [0, 0, 0, 0]
+        lproxy.GetLayoutExtent(extents)
+        return [
+            int(extents[1] - extents[0] + 1),
+            int(extents[3] - extents[2] + 1),
+        ]
+    except:
+        return None
+
+
+def restore_layout_size(lproxy, size):
+    if not size:
+        return
+
+    try:
+        lproxy.SetSize(int(size[0]), int(size[1]))
+    except:
+        pass
+
+
+def render_all_views_without_camera_reset():
+    """
+    Render current views without using simple.Render(), which can reset the camera
+    the first time it renders a view in a ParaView session.
+    """
+    try:
+        views = GetViews()
+    except:
+        views = []
+
+    for view in views:
+        try:
+            view.StillRender()
+        except:
+            pass
+
+
 # ----------------------------
 # Auto output folder
 # ----------------------------
@@ -155,11 +182,15 @@ print("Found layout proxies:", len(layout_proxies))
 if not layout_proxies:
     raise RuntimeError("No layouts found. Make sure you have at least one layout open.")
 
-# Render before saving
-try:
-    RenderAllViews()
-except:
-    pass
+original_layout_sizes = {}
+for lproxy in layout_proxies:
+    try:
+        original_layout_sizes[lproxy] = get_layout_size(lproxy)
+    except:
+        original_layout_sizes[lproxy] = None
+
+# Render before saving, preserving existing cameras.
+render_all_views_without_camera_reset()
 
 saved_count = 0
 used_names = set()
@@ -178,6 +209,9 @@ for i, lproxy in enumerate(layout_proxies, start=1):
     )
 
     print("Saving ->", out_png)
+    layout_size = original_layout_sizes.get(lproxy)
+    restore_layout_size(lproxy, layout_size)
+
     try:
         SaveScreenshot(
             out_png,
@@ -196,5 +230,7 @@ for i, lproxy in enumerate(layout_proxies, start=1):
     except Exception as e:
         print("ERROR saving", layout_name, ":", e)
         traceback.print_exc()
+    finally:
+        restore_layout_size(lproxy, layout_size)
 
 print("DONE. Saved files:", saved_count, "in", OUT_DIR)
